@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+25&display=swap" rel="stylesheet" />
+    <title>Ridiculous Hook HTML5</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="game-shell">
+        <canvas id="game" aria-label="Ridiculous Hook game canvas"></canvas>
+
+        <div id="hud">
+          <div id="hud-depth-row">
+            <div id="hud-left">
+              <div id="hud-caught">x0</div>
+              <div id="hud-danger" class="hud-danger hidden"></div>
+              <div id="hud-haul" class="hud-haul hidden" aria-hidden="true"></div>
+            </div>
+            <div id="hud-right">
+              <div id="hud-mult" class="hud-mult hidden"></div>
+              <div id="hud-depth">0m/100m</div>
+            </div>
+          </div>
+          <div id="hud-bonus" class="hud-bonus hidden"></div>
+          <div id="hud-toast" class="hud-toast hidden" aria-live="polite"></div>
+          <div id="hud-cta-bottom" class="hud-cta-bottom hidden" aria-live="polite"></div>
+          <div id="hud-phase"></div>
+        </div>
+
+        <div id="overlay">
+          <div id="overlay-tutorial" class="tutorial-overlay hidden" aria-live="polite">
+            <div id="overlay-tutorial-card" class="tutorial-card">
+              <div id="overlay-tutorial-title" class="tutorial-card__title">WATCH OUT</div>
+              <div id="overlay-tutorial-body" class="tutorial-card__body"></div>
+              <div id="overlay-tutorial-hand-wrap" class="tutorial-card__hand-wrap hidden" data-hint="tap">
+                <img
+                  id="overlay-tutorial-hand"
+                  class="tutorial-card__hand"
+                  src="/assets/tutorial-hand.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </div>
+              <div id="overlay-tutorial-footer" class="tutorial-card__footer">TAP TO CONTINUE</div>
+            </div>
+          </div>
+
+          <div id="overlay-ready" class="overlay-panel overlay-panel--ready">
+            <div class="ready-hero">
+              <div id="overlay-title">RIDICULOUS<br />HOOK</div>
+              <div id="overlay-sub">DROP - DODGE - CATCH</div>
+              <div class="ready-shop">
+                <div class="ready-shop-label">THIS RUN</div>
+                <div class="ready-shop-row">
+                  <button type="button" id="ready-upgrade-extra-lure" class="ready-consumable-btn">
+                    <span class="ready-consumable-name">EXTRA LURE</span>
+                    <span id="ready-upgrade-extra-lure-status" class="ready-consumable-status">EMPTY</span>
+                    <span id="ready-upgrade-extra-lure-cost" class="ready-consumable-cost">$0</span>
+                  </button>
+                  <button type="button" id="ready-upgrade-golden-reel" class="ready-consumable-btn">
+                    <span class="ready-consumable-name">GOLDEN REEL</span>
+                    <span id="ready-upgrade-golden-reel-status" class="ready-consumable-status">EMPTY</span>
+                    <span id="ready-upgrade-golden-reel-cost" class="ready-consumable-cost">$0</span>
+                  </button>
+                </div>
+              </div>
+              <button type="button" id="overlay-start" class="overlay-start">
+                TAP TO DROP
+              </button>
+            </div>
+          </div>
+
+          <div id="overlay-result" class="overlay-panel overlay-panel--result hidden" aria-live="polite">
+            <div class="result-scrim" aria-hidden="true"></div>
+            <div class="result-card">
+              <div class="result-header">// HAUL REPORT //</div>
+              <h2 id="result-heading" class="result-heading">CAUGHT!</h2>
+              <div id="result-rows" class="result-rows"></div>
+              <p id="result-empty" class="result-empty hidden">NOTHING HOOKED</p>
+              <div class="result-divider"></div>
+              <div id="result-meta" class="result-meta"></div>
+              <div id="result-bonus-line" class="result-bonus-line hidden"></div>
+              <div id="result-total" class="result-total">$0</div>
+              <div class="result-actions">
+                <button type="button" id="result-retry" class="result-retry">
+                  PLAY AGAIN
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="overlay-store-panel" class="overlay-sheet hidden" aria-live="polite">
+            <div id="store-coachmark" class="panel-coachmark hidden">
+              <div class="panel-coachmark__card">
+                <div class="panel-coachmark__icon">🛒</div>
+                <div class="panel-coachmark__title">UPGRADES</div>
+                <div class="panel-coachmark__body">Permanent improvements that carry over between every dive. Spend your coins here to go deeper and catch more.</div>
+                <button type="button" id="store-coachmark-ok" class="panel-coachmark__btn">GOT IT!</button>
+              </div>
+            </div>
+            <div class="sheet-card store-card">
+              <div class="sheet-title">UPGRADES</div>
+              <div class="store-stats">
+                <div class="store-meta">
+                  <div id="store-coins" class="store-meta__value">COINS $0</div>
+                </div>
+              </div>
+              <div class="store-grid">
+                <button type="button" id="ready-upgrade-line" class="store-upgrade-btn store-action">
+                  <span class="store-action__main">
+                    <span class="store-action__name">LINE LENGTH</span>
+                    <span class="store-action__desc">Extend your dive limit by 25m. Permanent.</span>
+                    <span id="ready-upgrade-line-status" class="store-action__status">100M</span>
+                  </span>
+                  <span id="ready-upgrade-cost" class="store-upgrade-btn__cost">$0</span>
+                </button>
+                <button type="button" id="ready-buy-luck-charm" class="store-upgrade-btn store-action">
+                  <span class="store-action__main">
+                    <span class="store-action__name">LUCK CHARM</span>
+                    <span class="store-action__desc">Permanently adds +10% treasure spawn chance.</span>
+                    <span id="ready-buy-luck-charm-status" class="store-action__status">INACTIVE</span>
+                  </span>
+                  <span id="ready-buy-luck-charm-cost" class="store-upgrade-btn__cost">$0</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="overlay-collection-panel" class="overlay-sheet hidden" aria-live="polite">
+            <div id="collection-coachmark" class="panel-coachmark hidden">
+              <div class="panel-coachmark__card">
+                <div class="panel-coachmark__icon">📖</div>
+                <div class="panel-coachmark__title">COLLECTION BOOK</div>
+                <div class="panel-coachmark__body">Every fish, treasure and item you discover gets logged here. Catch rare creatures to complete your book!</div>
+                <button type="button" id="collection-coachmark-ok" class="panel-coachmark__btn">GOT IT!</button>
+              </div>
+            </div>
+            <div class="sheet-card collection-card">
+              <div class="collection-header">
+                <div class="sheet-title">COLLECTION BOOK</div>
+              </div>
+              <div class="collection-tabs">
+                <button type="button" id="collection-tab-fish" class="collection-tab">FISH</button>
+                <button type="button" id="collection-tab-treasure" class="collection-tab">TREASURES</button>
+                <button type="button" id="collection-tab-trash" class="collection-tab">TRASH</button>
+              </div>
+              <div id="collection-entries" class="collection-entries"></div>
+            </div>
+          </div>
+
+          <div id="overlay-tools" class="overlay-tools hidden">
+            <button type="button" id="overlay-open-store" class="overlay-tool">UPGRADES</button>
+            <button type="button" id="overlay-open-collection" class="overlay-tool">COLLECTION</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

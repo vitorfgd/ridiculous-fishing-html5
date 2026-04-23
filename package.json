@@ -1,0 +1,15 @@
+{
+  "name": "ridiculous-hook-html5",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json && vite build",
+    "test": "tsc -p tsconfig.test.json && node --experimental-specifier-resolution=node .test-dist/test/run.js"
+  },
+  "devDependencies": {
+    "typescript": "~5.6.2",
+    "vite": "^6.0.1"
+  }
+}
