@@ -364,11 +364,8 @@ export class GameApp implements GameAppPublic {
           this.emit({ type: "phaseChanged", phase: "Ascent" });
         }
         this.shake = Math.max(this.shake, CONFIG.shakeHitDescent);
-        if (this.ftueMode === "run" && !this.ftueAscentShown) {
-          const currentDepth = Math.max(0, CONFIG.surfaceY - this.hookY);
-          if (currentDepth >= 36) {
-            this.activateFtueAscent();
-          }
+        if (this.ftueMode === "run" && hit.kind === "treasureChest" && !this.ftueAscentShown) {
+          this.activateFtueAscent();
         }
       }
       } else {
@@ -936,21 +933,21 @@ export class GameApp implements GameAppPublic {
       swimSpeed: 0,
     });
 
-    // Fish on descent — player learns to dodge (left / right / near-center alternating)
-    const fish1 = makeFish(9001, 20, -3.8, 0, 0, "sardine", "Blue Fish",  250, 1.12);
-    const fish2 = makeFish(9002, 32, 3.5,  1, 1, "trout",   "Snapper",   500, 1.08);
-    const fish3 = makeFish(9003, 40, -0.3, 0, 2, "sardine", "Blue Fish", 250, 1.10);
+    // Fish on descent — alternating sides so the player learns to steer
+    const fish1 = makeFish(9001, 18, -3.8, 0, 0, "sardine", "Blue Fish",  250, 1.12);
+    const fish2 = makeFish(9002, 27, 3.6,  1, 1, "trout",   "Snapper",   500, 1.08);
+    const fish3 = makeFish(9003, 35, -3.2, 0, 2, "sardine", "Blue Fish", 250, 1.10);
+    const fish4 = makeFish(9005, 40,  2.8, 1, 0, "trout",   "Snapper",   500, 1.06);
 
-    // Chest + trash hidden at start — activated when the player reverses deep enough
-    const hiddenChest = makeChest(9007, 22, 0.6);
-    hiddenChest.alive = false;
-    hiddenChest.state = "consumed";
+    // Chest visible on descent — catching it reverses the player
+    const chest = makeChest(9007, 47, 0.06);
 
-    const hiddenTrash = makeTrashBag(9004, 28, 3.3);
+    // Trash hidden until chest is caught — dodge on the way back up
+    const hiddenTrash = makeTrashBag(9004, 22, 3.4);
     hiddenTrash.alive = false;
     hiddenTrash.state = "consumed";
 
-    return [fish1, fish2, fish3, hiddenChest, hiddenTrash];
+    return [fish1, fish2, fish3, fish4, chest, hiddenTrash];
   }
 
   private handleFtuePointerInteraction(commandType: "pointerDown" | "pointerMove"): boolean {
@@ -1015,9 +1012,8 @@ export class GameApp implements GameAppPublic {
       }
     }
 
-    // Chest reveal — only for non-FTUE players who haven't seen it yet
-    // (FTUE players get chest reveal on the way back up, see updateFtueAscentBeats)
-    if (!this.ftueChestShown && !this.hasSeenChestTutorial && this.ftueMode !== "run") {
+    // Chest reveal — for all players who haven't seen it yet
+    if (!this.ftueChestShown && !this.hasSeenChestTutorial) {
       const chest = this.findNearestTutorialTarget("treasureChest", currentDepth);
       const chestDepth = chest ? Math.max(0, CONFIG.surfaceY - chest.y) : undefined;
       if (chestDepth !== undefined && currentDepth >= chestDepth - 10.5) {
@@ -1063,23 +1059,6 @@ export class GameApp implements GameAppPublic {
       }
     }
 
-    // Chest reveal — FTUE run on ascent, only when chest is above the hook
-    if (!this.ftueChestShown && !this.hasSeenChestTutorial && this.ftueMode === "run") {
-      const chest = this.findNearestTutorialTarget("treasureChest", currentDepth);
-      const chestDepth = chest ? Math.max(0, CONFIG.surfaceY - chest.y) : undefined;
-      if (chestDepth !== undefined && currentDepth <= chestDepth + 10.5 && chestDepth < currentDepth) {
-        this.ftueChestShown = true;
-        this.hasSeenChestTutorial = true;
-        if (chest) {
-          this.ftueRevealTargetY = chest.y;
-          this.ftueSpotlightX = chest.x;
-          this.ftueSpotlightY = chest.y;
-          this.ftueSpotlightColor = "#ffd700";
-        }
-        this.syncProfile();
-        this.startFtuePause("chestReveal", true, 0.5);
-      }
-    }
   }
 
   private startFtuePause(step: FtueStep, useSlowMo = true, slowMoDuration = 0.42): void {
